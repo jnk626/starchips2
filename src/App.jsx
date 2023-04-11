@@ -5,8 +5,23 @@ import "./App.css";
 function App() {
   const [ships, addShip] = useState([]);
 
-  function createTable() {
-    return (
+  function getShips(query) {
+    let shiplist = [];
+    for (let ship of query.data.results) {
+      shiplist.push(ship);
+    }
+
+    return shiplist;
+  }
+
+  async function getChips() {
+    let query = await axios.get("https://swapi.dev/api/starships");
+    addShip([...ships, ...getShips(query)]);
+  }
+
+  return (
+    <div className="App">
+      <button onClick={getChips}>Click me</button>
       <table>
         <thead>
           <tr>
@@ -16,45 +31,19 @@ function App() {
           </tr>
         </thead>
         <tbody>
-        <tr>
-        <td>
-          {ships[0].name}
-        </td>
-      </tr>
+          {ships.map((ship) => {
+            return (
+              <tr>
+                <td>{ship.name}</td>
+                <td>{ship.manufacturer}</td>
+                <td>{ship.cost_in_credits}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-    )
-  }
-
-  function getShips(query) {
-    let shiplist = [];
-    for (let ship of query.data.results) {
-      shiplist.push(ship);
-    }
-    
-    return shiplist;
-  }
-
-  /*async function getShips(query) {
-    for (let ship of query.data.results) {
-      addShip([...ships, ship]);
-    }
-    console.log(ships);
-  }*/
-
-    async function getChips() {
-      let query = axios.get("https://swapi.dev/api/starships");
-      let result = await query;
-      addShip([...ships, ...getShips(result)]);
-      //getShips(query);
-      return createTable();
-    }
-
-    return (
-      <div className="App">
-        <button onClick={getChips}>Click me</button>
-      </div>
-    );
-  }
+    </div>
+  );
+}
 
 export default App;
